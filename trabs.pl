@@ -1,6 +1,6 @@
 :- use_module(library(pio)).
 
-lerArquivo :- ['Desktop/Prolog/dados.pl'].
+:- ['Desktop/Prolog/dados.pl'].
 
 pisoMinimo(P) :-
 	dados_via(Cod, _, _, _, caracteristicas(X, _, _)),
