@@ -8,6 +8,19 @@ pisoMinimo(Z,P) :-
 duracao(L,V,D) :-
 	D is L/V.
 
+custo(L,P,V,C,R) :-
+	R is ((L/V)*C+P).
+
+%----Verifica Custo
+connected_custo(X,Y,M,C,R,I) :-
+	dados_via(I, X, Y, L, caracteristicas(Z, P, V)),
+	pisoMinimo(Z,M),
+	custo(L,P,V,C,R)
+	;
+	dados_via(I, Y, X, L, caracteristicas(Z, P, V)),
+	pisoMinimo(Z,M),
+	custo(L,P,V,C,R).
+
 %----Verifica Duracao
 connected_dur(X,Y,P,D,I) :-
 	dados_via(I, X, Y, L, caracteristicas(Z, _, V)),
@@ -26,6 +39,26 @@ connected(X,Y,P,L,I) :-
 	;
 	dados_via(I, Y, X, L, caracteristicas(Z, _, _)),
 	pisoMinimo(Z,P).
+
+%----Custo
+path_custo(A,B,V,C,Path,Len) :-
+	travel_custo(A,B,[A],V,C,Q,Len),
+	reverse(Q,Path).
+
+travel_custo(A,B,P,V,C,[B|P],L) :-
+	connected_custo(A,B,V,C,L,_).
+
+travel_custo(A,B,Visited,V,K,Path,L) :-
+	connected_custo(A,C,V,K,D,_),
+	C \== B,
+	\+ member(C, Visited),
+	travel_custo(C,B,[C|Visited],V,K,Path,L1),
+	L is D+L1.
+
+shortest_custo(A,B,V,C,Path,Lenght) :-
+	setof([P,L],path_custo(A,B,V,C,P,L),Set),
+	Set = [_|_],
+	minimal(Set,[Path,Lenght]).
 
 %----Distancia
 path(A,B,V,Path,Len) :-
