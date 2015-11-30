@@ -5,29 +5,38 @@
 pisoMinimo(Z,P) :-
 	Z >= P.
 
-%----Verifica se esta conectado
-connected(X,Y,L) :-
-	dados_via(_,X,Y,L,caracteristicas(_,_,_))
-	;
-	dados_via(_,Y,X,L,caracteristicas(_,_,_)).
+duracao(L,V,D) :-
+	D is L/V.
 
-%----Verifica se esta conectado e o piso e suficientemente bom
-connected(X,Y,P,L) :-
-	dados_via(_, X, Y, L, caracteristicas(Z, _, _)),
+%----Verifica Duracao
+connected_dur(X,Y,P,D,I) :-
+	dados_via(I, X, Y, L, caracteristicas(Z, _, V)),
+	pisoMinimo(Z,P),
+	duracao(L,V,D)
+	;
+	dados_via(I, Y, X, L, caracteristicas(Z, _, V)),
+	pisoMinimo(Z,P),
+	duracao(L,V,D).
+
+
+%----Verifica Distancia
+connected(X,Y,P,L,I) :-
+	dados_via(I, X, Y, L, caracteristicas(Z, _, _)),
 	pisoMinimo(Z,P)
 	;
-	dados_via(_, Y, X, L, caracteristicas(Z, _, _)),
+	dados_via(I, Y, X, L, caracteristicas(Z, _, _)),
 	pisoMinimo(Z,P).
 
+%----Distancia
 path(A,B,V,Path,Len) :-
 	travel(A,B,[A],V,Q,Len),
 	reverse(Q,Path).
 
 travel(A,B,P,V,[B|P],L) :-
-	connected(A,B,V,L).
+	connected(A,B,V,L,_).
 
 travel(A,B,Visited,V,Path,L) :-
-	connected(A,C,V,D),
+	connected(A,C,V,D,_),
 	C \== B,
 	\+ member(C, Visited),
 	travel(C,B,[C|Visited],V,Path,L1),
@@ -38,30 +47,29 @@ shortest(A,B,V,Path,Lenght) :-
 	Set = [_|_],
 	minimal(Set,[Path,Lenght]).
 
-%----
+%----Duracao
+path_dur(A,B,V,Path,Len) :-
+	travel_dur(A,B,[A],V,Q,Len),
+	reverse(Q,Path).
 
-path(A,B,Path,Len) :-
-	travel(A,B,[A],Q,Len),
-	reverse(Q, Path).
+travel_dur(A,B,P,V,[B|P],L) :-
+	connected_dur(A,B,V,L,_).
 
-travel(A,B,P,[B|P],L) :-
-	connected(A,B,L).
-
-travel(A,B,Visited,Path,L) :-
-	connected(A,C,D),
+travel_dur(A,B,Visited,V,Path,L) :-
+	connected_dur(A,C,V,D,_),
 	C \== B,
 	\+ member(C, Visited),
-	travel(C,B,[C|Visited],Path,L1),
+	travel_dur(C,B,[C|Visited],V,Path,L1),
 	L is D+L1.
 
-shortest(A,B,Path,Lenght) :-
-	setof([P,L],path(A,B,P,L),Set),
-	Set = [_|_], % Verifica se esta vazio
+shortest_dur(A,B,V,Path,Lenght) :-
+	setof([P,L],path_dur(A,B,V,P,L),Set),
+	Set = [_|_],
 	minimal(Set,[Path,Lenght]).
 
+%----Verificador
 minimal([F|R],M) :- min(R,F,M).
 
-%----Verificador
 min([],M,M).
 min([[P,L]|R],[_,M],Min) :- L < M, !, min(R,[P,L],Min).
 min([_|R], M, Min) :- min(R,M,Min).
