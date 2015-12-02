@@ -9,7 +9,8 @@ duracao(L,V,D) :-
 	D is L/V.
 
 custo(L,P,V,C,R) :-
-	R is ((L/V)*C+P).
+	duracao(L,V,D),
+	R is (V/C*D*2.5+P).  
 
 %----Verifica Custo
 connected_custo(X,Y,M,C,R,I) :-
