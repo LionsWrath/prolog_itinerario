@@ -9,7 +9,8 @@ duracao(L,V,D) :-
 	D is L/V.
 
 custo(L,P,V,C,R) :-
-	R is (L*V*C+P).       %distancia/consumo medio(km/L) = L consumidos durante a viagem. Consumo medio depende da velocidade do veiculo
+        duracao(L,V,D),
+	R is (V/C*D*2.5+P). 
 
 %----Transform
 
@@ -35,7 +36,6 @@ recursive_search([X|Path],V,New,Len,R) :-
 	Len is D+L.
 
 getDes([Y|_],Y).
-
 
 %----Verifica Custo
 connected_custo(X,Y,M,C,R,I) :-
