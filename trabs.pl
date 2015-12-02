@@ -9,7 +9,33 @@ duracao(L,V,D) :-
 	D is L/V.
 
 custo(L,P,V,C,R) :-
-	R is ((L/V)*C+P).
+	R is (L*V*C+P).       %distancia/consumo medio(km/L) = L consumidos durante a viagem. Consumo medio depende da velocidade do veiculo
+
+%----Transform
+
+print_rota([],[]) :- !.
+
+print_rota([T|R],[X|Path]) :-
+	getDes(Path,Y),
+	writeln([T,X,Y]),
+	print_rota(R,Path).
+
+get_rota(A,B,V) :-
+	shortest(A,B,V,Path,Len),
+	recursive_search(Path,V,[],L,R),
+	L == Len,
+	print_rota(R,Path).
+
+recursive_search([_],_,I,L,R) :- reverse(I,R), L is 0,!.
+
+recursive_search([X|Path],V,New,Len,R) :-
+	getDes(Path,Y),
+	connected(X,Y,V,D,I),
+	recursive_search(Path,V,[I|New],L,R),
+	Len is D+L.
+
+getDes([Y|_],Y).
+
 
 %----Verifica Custo
 connected_custo(X,Y,M,C,R,I) :-
@@ -106,3 +132,45 @@ minimal([F|R],M) :- min(R,F,M).
 min([],M,M).
 min([[P,L]|R],[_,M],Min) :- L < M, !, min(R,[P,L],Min).
 min([_|R], M, Min) :- min(R,M,Min).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
