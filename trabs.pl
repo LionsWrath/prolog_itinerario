@@ -10,21 +10,26 @@ duracao(L,V,D) :-
 
 custo(L,P,V,C,R) :-
         duracao(L,V,D),
-	R is (V/C*D*2.5+P). 
+	R is (V/C*D*2.5+P).
 
 %----Transform
 
-print_rota([],[]) :- !.
+print_rota([],[_]) :- !.
 
 print_rota([T|R],[X|Path]) :-
 	getDes(Path,Y),
 	writeln([T,X,Y]),
 	print_rota(R,Path).
 
+getDes([Y|_],Y).
+
+%----
+
 get_rota(A,B,V) :-
 	shortest(A,B,V,Path,Len),
 	recursive_search(Path,V,[],L,R),
 	L == Len,
+	writeln(L),
 	print_rota(R,Path).
 
 recursive_search([_],_,I,L,R) :- reverse(I,R), L is 0,!.
@@ -35,7 +40,40 @@ recursive_search([X|Path],V,New,Len,R) :-
 	recursive_search(Path,V,[I|New],L,R),
 	Len is D+L.
 
-getDes([Y|_],Y).
+%----
+
+get_rota_dur(A,B,V) :-
+	shortest_dur(A,B,V,Path,Len),
+	recursive_search_dur(Path,V,[],L,R),
+	L == Len,
+	writeln(L),
+	print_rota(R,Path).
+
+recursive_search_dur([_],_,I,L,R) :- reverse(I,R), L is 0, !.
+
+recursive_search_dur([X|Path],V,New,Len,R) :-
+	getDes(Path,Y),
+	connected_dur(X,Y,V,D,I),
+	recursive_search_dur(Path,V,[I|New],L,R),
+	Len is D+L.
+
+%----
+
+get_rota_custo(A,B,V,C) :-
+	shortest_custo(A,B,V,C,Path,Len),
+	recursive_search_custo(Path,V,C,[],L,R),
+	L == Len,
+	writeln(L),
+	print_rota(R,Path).
+
+recursive_search_custo([_],_,_,I,L,R) :- reverse(I,R), L is 0, !.
+
+recursive_search_custo([X|Path],V,C,New,Len,R) :-
+	getDes(Path,Y),
+	connected_custo(X,Y,V,C,D,I),
+	recursive_search_custo(Path,V,C,[I|New],L,R),
+	Len is D+L.
+
 
 %----Verifica Custo
 connected_custo(X,Y,M,C,R,I) :-
