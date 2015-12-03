@@ -1,6 +1,112 @@
 :- use_module(library(pio)).
 
-:- ['dados/dados_teste.pl'].
+:- use_module(library(tty)).
+
+:- ['Desktop/Prolog/dados.pl'].
+
+start :-
+	tty_clear,
+	write('                          '),nl,
+	write('   *************************************   '),nl,
+	write('   *** Prolog Itinerario Otimo - PIO ***   '),nl,
+	write('   *************************************   '),nl,
+	write('   Selecione o modo de busca desejado:'),nl,
+	write('      1.Menor distancia percorrida;'),nl,
+	write('      2.Menor duracao prevista;'),nl,
+	write('      3.Menor custo;'),nl,
+	write('      4.Exit.'),nl,
+	write('   Informe sua escolha:(1,2,3)'),nl,
+	read(Op),
+	(
+	    Op == 1, opcao1,!
+	    ;
+	    Op == 2, opcao2,!
+	    ;
+	    Op == 3, opcao3,!
+	    ;
+	    Op == 4, halt,!
+	    ;
+	    start
+	).
+
+menu :-
+	write('   Selecione o modo de busca desejado:'),nl,
+	write('      1.Menor distancia percorrida;'),nl,
+	write('      2.Menor duracao prevista;'),nl,
+	write('      3.Menor custo;'),nl,
+	write('      4.Exit.'),nl,
+	write('   Informe sua escolha:(1,2,3)'),nl,
+	read(Op),
+	(
+	    Op == 1, opcao1,!
+	    ;
+	    Op == 2, opcao2,!
+	    ;
+	    Op == 3, opcao3,!
+	    ;
+	    Op == 4, halt,!
+	    ;
+	    start
+	).
+
+opcao1 :-
+	tty_clear,
+	write('   Opcao selecionada:'), nl,
+	write('>>> Menor distancia <<<'),nl,
+	write('   Cidades disponiveis:'), nl,
+	forall(cidade(C),(write('*'),write(C),nl)),!,
+	write('   Informe a cidade de origem: '),
+	read(Origem),
+	write('   Informe a cidade destino: '),
+	read(Destino),
+	write('   Informe a qualidade minima do piso desejavel(1-5): '),
+	read(Piso),
+	(
+	    get_rota(Origem,Destino,Piso)
+	    ;
+	    tty_clear, write('>>> Dados invalidos! <<<')
+	),nl, write('-------- Fim de busca! --------'),nl,nl,
+	menu.
+
+opcao2 :-
+	tty_clear,
+	write('   Opcao selecionada:'), nl,
+	write('>>> Menor duracao <<<'), nl,
+	write('   Cidades disponiveis:'), nl,
+	forall(cidade(C),(write('*'),write(C),nl)),!,
+	write('   Informe a cidade de origem: '),
+	read(Origem),
+	write('   Informe a cidade destino: '),
+	read(Destino),
+	write('   Informe a qualidade minima do piso desejavel(1-5): '),
+	read(Piso),
+	(
+	    get_rota_dur(Origem,Destino,Piso)
+	    ;
+	    tty_clear, write('>>> Dados invalidos! <<<')
+	),nl, write('-------- Fim de busca! --------'),nl,nl,
+	menu.
+
+opcao3 :-
+	tty_clear,
+	write('   Opcao selecionada:'), nl,
+	write('>>> Menor custo <<<'), nl,
+	write('   Cidades disponiveis:'), nl,
+	forall(cidade(C),(write('*'),write(C),nl)),!,
+	write('   Informe a cidade de origem: '),
+	read(Origem),
+	write('   Informe a cidade destino: '),
+	read(Destino),
+	write('   Informe a qualidade minima do piso desejavel(1-5): '),
+	read(Piso),
+	write('   Informe o consumo medio de seu veiculo(km/L): '),
+	read(Consumo),
+	(
+	    get_rota_custo(Origem,Destino,Piso,Consumo)
+	    ;
+	    tty_clear, write('>>> Dados invalidos! <<<')
+	),nl, write('-------- Fim de busca! --------'),nl,nl,
+	menu.
 
 pisoMinimo(Z,P) :-
 	Z >= P.
@@ -10,7 +116,7 @@ duracao(L,V,D) :-
 
 custo(L,P,V,C,R) :-
         duracao(L,V,D),
-	R is (V/C*D*2.5+P).
+	R is (V/C*D*3.7+P).
 
 %----Transform
 
@@ -29,7 +135,8 @@ get_rota(A,B,V) :-
 	shortest(A,B,V,Path,Len),
 	recursive_search(Path,V,[],L,R),
 	L == Len,
-	writeln(L),
+	write('*Distancia minima: '),write(L), write(' km'),nl,
+	write('*Rota: '),nl,
 	print_rota(R,Path).
 
 recursive_search([_],_,I,L,R) :- reverse(I,R), L is 0,!.
@@ -46,7 +153,8 @@ get_rota_dur(A,B,V) :-
 	shortest_dur(A,B,V,Path,Len),
 	recursive_search_dur(Path,V,[],L,R),
 	L == Len,
-	writeln(L),
+	write('*Duracao estimada minima: '),write(L),write(' horas'),nl,
+	write('*Rota: '),nl,
 	print_rota(R,Path).
 
 recursive_search_dur([_],_,I,L,R) :- reverse(I,R), L is 0, !.
@@ -63,7 +171,8 @@ get_rota_custo(A,B,V,C) :-
 	shortest_custo(A,B,V,C,Path,Len),
 	recursive_search_custo(Path,V,C,[],L,R),
 	L == Len,
-	writeln(L),
+	write('*Custo estimado minimo: '),write(L),write(' reais'),nl,
+	write('*Rota: '),nl,
 	print_rota(R,Path).
 
 recursive_search_custo([_],_,_,I,L,R) :- reverse(I,R), L is 0, !.
@@ -170,45 +279,3 @@ minimal([F|R],M) :- min(R,F,M).
 min([],M,M).
 min([[P,L]|R],[_,M],Min) :- L < M, !, min(R,[P,L],Min).
 min([_|R], M, Min) :- min(R,M,Min).
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
