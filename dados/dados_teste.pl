@@ -1,3 +1,27 @@
+cidade(loanda).
+cidade(nova_esperanca).
+cidade(maringa).
+cidade(sarandi).
+cidade(londrina).
+cidade(cornelio_procopio).
+cidade(arapongas).
+cidade(mandaguari).
+cidade(fenix).
+cidade(jandaia_do_sul).
+cidade(apucarana).
+cidade(ponta_grossa).
+cidade(iretama).
+cidade(campo_mourao).
+cidade(umuarama).
+cidade(guaira).
+cidade(toledo).
+cidade(cascavel).
+cidade(roncador).
+cidade(manoel_ribas).
+cidade(guarapuava).
+cidade(foz_do_iguacu).
+cidade(pato_branco).
+cidade(curitiba).
 dados_via(pr1, loanda, nova_esperanca, 112, caracteristicas(1,0,80)).
 dados_via(pr2, nova_esperanca, maringa, 43.4, caracteristicas(3,7.5,90)). 
 dados_via(pr3, maringa, sarandi, 7.6, caracteristicas(5,0,60)). 
