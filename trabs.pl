@@ -2,7 +2,7 @@
 
 :- use_module(library(tty)).
 
-:- ['Desktop/Prolog/dados.pl'].
+:- ['dados/dados_teste.pl'].
 
 start :-
 	tty_clear,
@@ -64,7 +64,7 @@ opcao1 :-
 	(
 	    get_rota(Origem,Destino,Piso)
 	    ;
-	    tty_clear, write('>>> Dados invalidos! <<<')
+	    tty_clear, write('>>> Busca falhou! <<<')
 	),nl, write('-------- Fim de busca! --------'),nl,nl,
 	menu.
 
@@ -83,7 +83,7 @@ opcao2 :-
 	(
 	    get_rota_dur(Origem,Destino,Piso)
 	    ;
-	    tty_clear, write('>>> Dados invalidos! <<<')
+	    tty_clear, write('>>> Busca falhou! <<<')
 	),nl, write('-------- Fim de busca! --------'),nl,nl,
 	menu.
 
@@ -104,7 +104,7 @@ opcao3 :-
 	(
 	    get_rota_custo(Origem,Destino,Piso,Consumo)
 	    ;
-	    tty_clear, write('>>> Dados invalidos! <<<')
+	    tty_clear, write('>>> Busca falhou! <<<')
 	),nl, write('-------- Fim de busca! --------'),nl,nl,
 	menu.
 
