@@ -2,7 +2,41 @@
 
 :- use_module(library(tty)).
 
+:- use_module(library(plunit)).
+
 :- ['dados/dados_teste.pl'].
+
+%----Testes
+:- begin_tests(shortest).
+
+test(t0, Len == 56.4) :- shortest(sarandi,apucarana,0, _, Len).
+test(t1, [fail]) :- shortest(sarandi,apucarana,6, _, _).
+test(t2, Path == [mandaguari,fenix]) :- shortest(mandaguari, fenix, 1, Path, _).
+test(t3, Path == [mandaguari]) :- shortest(mandaguari, mandaguari, 1, Path, _).
+test(t4, Path == [mandaguari]) :- shortest(mandaguari, mandaguari, 10, Path, _).
+
+:- end_tests(shortest).
+
+:- begin_tests(shortest_dur).
+
+test(t0, Dur == 0.61775) :- shortest_dur(sarandi,apucarana,0,_,Dur).
+test(t1, [fail]) :- shortest_dur(sarandi,apucarana,10,_,_).
+test(t2, Path == [sarandi, jandaia_do_sul, apucarana]) :- shortest_dur(sarandi,apucarana,0, Path,_).
+test(t3, Path == [apucarana]) :- shortest_dur(apucarana,apucarana,2,Path,_).
+test(t4, Path == [apucarana]) :- shortest_dur(apucarana,apucarana,20,Path,_).
+
+:- end_tests(shortest_dur).
+
+:- begin_tests(shortest_custo).
+
+test(t0, Custo == 13.911999999999999) :- shortest_custo(sarandi,apucarana,0,15,_,Custo).
+test(t1, [fail]) :- shortest_custo(sarandi,apucarana,10,10,_,_).
+test(t2, Path == [sarandi, jandaia_do_sul, apucarana]) :- shortest_custo(sarandi,apucarana,0, 15, Path,_).
+test(t3, Path == [apucarana]) :- shortest_custo(apucarana,apucarana,2,10,Path,_).
+test(t4, Path == [apucarana]) :- shortest_custo(apucarana,apucarana,20,1000,Path,_).
+test(t2, Path == [sarandi, jandaia_do_sul, apucarana]) :- shortest_custo(sarandi,apucarana,0, 15000, Path,_).
+
+:- end_tests(shortest_custo).
 
 start :-
 	tty_clear,
@@ -62,6 +96,7 @@ opcao1 :-
 	write('   Informe a qualidade minima do piso desejavel(1-5): '),
 	read(Piso),
 	(
+	    tty_clear,
 	    get_rota(Origem,Destino,Piso)
 	    ;
 	    tty_clear, write('>>> Busca falhou! <<<')
@@ -81,6 +116,7 @@ opcao2 :-
 	write('   Informe a qualidade minima do piso desejavel(1-5): '),
 	read(Piso),
 	(
+	    tty_clear,
 	    get_rota_dur(Origem,Destino,Piso)
 	    ;
 	    tty_clear, write('>>> Busca falhou! <<<')
@@ -102,6 +138,7 @@ opcao3 :-
 	write('   Informe o consumo medio de seu veiculo(km/L): '),
 	read(Consumo),
 	(
+	    tty_clear,
 	    get_rota_custo(Origem,Destino,Piso,Consumo)
 	    ;
 	    tty_clear, write('>>> Busca falhou! <<<')
@@ -228,6 +265,8 @@ travel_custo(A,B,Visited,V,K,Path,L) :-
 	travel_custo(C,B,[C|Visited],V,K,Path,L1),
 	L is D+L1.
 
+shortest_custo(A,A,_,_,[A],0) :- !.
+
 shortest_custo(A,B,V,C,Path,Lenght) :-
 	setof([P,L],path_custo(A,B,V,C,P,L),Set),
 	Set = [_|_],
@@ -247,6 +286,8 @@ travel(A,B,Visited,V,Path,L) :-
 	\+ member(C, Visited),
 	travel(C,B,[C|Visited],V,Path,L1),
 	L is D+L1.
+
+shortest(A,A,_,[A],0) :- !.
 
 shortest(A,B,V,Path,Lenght) :-
 	setof([P,L],path(A,B,V,P,L),Set),
@@ -268,6 +309,8 @@ travel_dur(A,B,Visited,V,Path,L) :-
 	travel_dur(C,B,[C|Visited],V,Path,L1),
 	L is D+L1.
 
+shortest_dur(A,A,_,[A],0) :- !.
+
 shortest_dur(A,B,V,Path,Lenght) :-
 	setof([P,L],path_dur(A,B,V,P,L),Set),
 	Set = [_|_],
@@ -279,3 +322,7 @@ minimal([F|R],M) :- min(R,F,M).
 min([],M,M).
 min([[P,L]|R],[_,M],Min) :- L < M, !, min(R,[P,L],Min).
 min([_|R], M, Min) :- min(R,M,Min).
+
+
+
+
