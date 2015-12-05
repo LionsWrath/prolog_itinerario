@@ -4,8 +4,6 @@
 
 :- use_module(library(plunit)).
 
-:- ['dados/dados_teste.pl'].
-
 %----Testes
 :- begin_tests(shortest).
 
@@ -43,7 +41,14 @@ start :-
 	write('                          '),nl,
 	write('   *************************************   '),nl,
 	write('   *** Prolog Itinerario Otimo - PIO ***   '),nl,
-	write('   *************************************   '),nl,
+	write('   *************************************   '),nl,nl,
+	write('   Deseja importar um novo arquivo?(S/N) '),nl,
+	read(X),
+	(
+	    X == 's', lerArq
+	    ;
+	    X == 'n'
+	),
 	write('   Selecione o modo de busca desejado:'),nl,
 	write('      1.Menor distancia percorrida;'),nl,
 	write('      2.Menor duracao prevista;'),nl,
@@ -63,7 +68,19 @@ start :-
 	    start
 	).
 
+lerArq :-
+	write('   Informe o nome do arquivo(Utilize aspas simples): '),
+	read(Arq),
+	consult(Arq).
+
 menu :-
+	write('   Deseja importar um novo arquivo?(S/N) '),nl,
+	read(X),
+	(
+	    X == 's', lerArq
+	    ;
+	    X == 'n'
+	),
 	write('   Selecione o modo de busca desejado:'),nl,
 	write('      1.Menor distancia percorrida;'),nl,
 	write('      2.Menor duracao prevista;'),nl,
