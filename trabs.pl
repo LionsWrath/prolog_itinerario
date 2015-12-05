@@ -181,6 +181,20 @@ print_rota([T|R],[X|Path]) :-
 	writeln([T,X,Y]),
 	print_rota(R,Path).
 
+print_rota_arq(R,Path) :-
+	open('output.txt',write,Stream),
+	print_arq(R,Path,Stream),
+	close(Stream).
+
+print_arq([],[_], _) :- !.
+
+print_arq([T|R], [X|Path], Stream) :-
+	getDes(Path, Y),
+	write(Stream,[T,X,Y]), nl(Stream),
+	writeln([T,X,Y]),
+	print_rota(R,Path),
+	print_arq(R,Path,Stream).
+
 getDes([Y|_],Y).
 
 %----
@@ -339,7 +353,3 @@ minimal([F|R],M) :- min(R,F,M).
 min([],M,M).
 min([[P,L]|R],[_,M],Min) :- L < M, !, min(R,[P,L],Min).
 min([_|R], M, Min) :- min(R,M,Min).
-
-
-
-
