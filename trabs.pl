@@ -5,6 +5,7 @@
 :- use_module(library(plunit)).
 
 %----Testes
+
 :- begin_tests(shortest).
 
 test(t0, Len == 56.4) :- shortest(sarandi,apucarana,0, _, Len).
@@ -12,6 +13,14 @@ test(t1, [fail]) :- shortest(sarandi,apucarana,6, _, _).
 test(t2, Path == [mandaguari,fenix]) :- shortest(mandaguari, fenix, 1, Path, _).
 test(t3, Path == [mandaguari]) :- shortest(mandaguari, mandaguari, 1, Path, _).
 test(t4, Path == [mandaguari]) :- shortest(mandaguari, mandaguari, 10, Path, _).
+test(t5) :- shortest(maringa,curitiba,3,_,430.0).
+test(t6, Q == [maringa, sarandi, jandaia_do_sul, apucarana, ponta_grossa, curitiba]) :- shortest(maringa,curitiba,3,Q,430.0).
+test(t7) :- shortest(curitiba,maringa,3,_,430.0).
+test(t8, fail) :- shortest(sarandi,loanda,4,_,_).
+test(t9, true) :- shortest(sarandi,loanda,1,_,_).
+test(t10, fail) :- shortest(maringa,curitiba,5,_,_).
+test(t11) :- shortest(londrina,mandaguari,5,_,129.2).
+test(t12, fail) :- shortest(londrina,mandaguari,5,[londrina, sarandi, mandaguari],_).
 
 :- end_tests(shortest).
 
@@ -22,6 +31,14 @@ test(t1, [fail]) :- shortest_dur(sarandi,apucarana,10,_,_).
 test(t2, Path == [sarandi, jandaia_do_sul, apucarana]) :- shortest_dur(sarandi,apucarana,0, Path,_).
 test(t3, Path == [apucarana]) :- shortest_dur(apucarana,apucarana,2,Path,_).
 test(t4, Path == [apucarana]) :- shortest_dur(apucarana,apucarana,20,Path,_).
+test(t5, Dur =< 5, Dur >= 4.5) :- shortest_dur(maringa,curitiba,3,_,Dur).
+test(t6, Dur =< 1.3, Dur >= 1.2) :- shortest_dur(londrina,mandaguari,5,_,Dur).
+test(t7, Dur =< 5, Dur >= 4.5) :- shortest_dur(curitiba,maringa,3,_,Dur).
+test(t8, Q == [apucarana, arapongas, londrina]) :- shortest_dur(apucarana,londrina,3,Q,0.556).
+test(t9, fail) :- shortest_dur(sarandi,loanda,4,_,_).
+test(t10, true) :- shortest_dur(sarandi,loanda,1,_,_).
+test(t11, fail) :- shortest_dur(maringa,curitiba,5,_,_).
+test(t12, fail) :- shortest_dur(londrina,mandaguari,5,[londrina, sarandi, mandaguari],_).
 
 :- end_tests(shortest_dur).
 
@@ -32,7 +49,15 @@ test(t1, [fail]) :- shortest_custo(sarandi,apucarana,10,10,_,_).
 test(t2, Path == [sarandi, jandaia_do_sul, apucarana]) :- shortest_custo(sarandi,apucarana,0, 15, Path,_).
 test(t3, Path == [apucarana]) :- shortest_custo(apucarana,apucarana,2,10,Path,_).
 test(t4, Path == [apucarana]) :- shortest_custo(apucarana,apucarana,20,1000,Path,_).
-test(t2, Path == [sarandi, jandaia_do_sul, apucarana]) :- shortest_custo(sarandi,apucarana,0, 15000, Path,_).
+test(t5, Path == [sarandi, jandaia_do_sul, apucarana]) :- shortest_custo(sarandi,apucarana,0, 15000, Path,_).
+test(t6, Q =< 199, Q >= 198) :- shortest_custo(maringa,curitiba,3,10,_,Q).
+test(t7, Q >= 67, Q =< 68) :- shortest_custo(sarandi,loanda,1,10,_,Q).
+test(t8, Q == [apucarana, arapongas, londrina]) :- shortest_custo(apucarana,londrina,3,10,Q,_).
+test(t9) :- shortest_custo(curitiba,maringa,3,10,_,198.3).
+test(t10, fail) :- shortest_custo(sarandi,loanda,4,10,_,_).
+test(t11, fail) :- shortest_custo(maringa,curitiba,5,10,_,_).
+test(t12, Q == 67.804) :- shortest_custo(londrina,mandaguari,5,10,_,Q).
+test(t13, fail) :- shortest_custo(londrina,mandaguari,5,10,[londrina, sarandi, mandaguari],_).
 
 :- end_tests(shortest_custo).
 
@@ -191,8 +216,6 @@ print_arq([],[_], _) :- !.
 print_arq([T|R], [X|Path], Stream) :-
 	getDes(Path, Y),
 	write(Stream,[T,X,Y]), nl(Stream),
-	writeln([T,X,Y]),
-	print_rota(R,Path),
 	print_arq(R,Path,Stream).
 
 getDes([Y|_],Y).
@@ -205,7 +228,14 @@ get_rota(A,B,V) :-
 	L == Len,
 	write('*Distancia minima: '),write(L), write(' km'),nl,
 	write('*Rota: '),nl,
-	print_rota(R,Path).
+	print_rota(R,Path),
+	write('   Deseja gravar sua busca em um arquivo de texto?(S/N)'),nl,
+	read(X),
+	(
+	    X == 's', print_rota_arq(R,Path)
+	    ;
+	    X == 'n'
+	).
 
 recursive_search([_],_,I,L,R) :- reverse(I,R), L is 0,!.
 
@@ -223,7 +253,8 @@ get_rota_dur(A,B,V) :-
 	L == Len,
 	write('*Duracao estimada minima: '),write(L),write(' horas'),nl,
 	write('*Rota: '),nl,
-	print_rota(R,Path).
+	print_rota(R,Path),
+	print_rota_arq(R,Path).
 
 recursive_search_dur([_],_,I,L,R) :- reverse(I,R), L is 0, !.
 
@@ -241,7 +272,8 @@ get_rota_custo(A,B,V,C) :-
 	L == Len,
 	write('*Custo estimado minimo: '),write(L),write(' reais'),nl,
 	write('*Rota: '),nl,
-	print_rota(R,Path).
+	print_rota(R,Path),
+	print_rota_arq(R,Path).
 
 recursive_search_custo([_],_,_,I,L,R) :- reverse(I,R), L is 0, !.
 
